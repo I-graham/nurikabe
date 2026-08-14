@@ -110,6 +110,7 @@ pub enum Reason {
     AllPathsBorder,
     ByContradiction(usize),
     Bifurcation,
+    Elimination,
 }
 
 impl Display for Reason {
@@ -130,6 +131,7 @@ impl Display for Reason {
             SeaComplete => "Sea complete",
             ByContradiction(l) => return write!(f, "Contradiction in {} steps", l),
             Bifurcation => "Arbitrary",
+            Elimination => "Process of Elimination"
         };
 
         write!(f, "{}", reason)

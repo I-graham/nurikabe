@@ -14,7 +14,9 @@ pub use solve::*;
 pub use ui::*;
 pub use utils::*;
 
+#[cfg(feature="mimalloc")]
 use mimalloc::MiMalloc;
 
+#[cfg(feature="mimalloc")]
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;

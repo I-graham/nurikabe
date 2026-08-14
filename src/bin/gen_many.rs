@@ -14,7 +14,7 @@ fn main() -> Result<()> {
         max_amends: 4,
     };
 
-    let mut file = std::fs::File::create("puzzles7.b64l")?;
+    let mut file = std::fs::File::create("puzzles.b64l")?;
 
     for _ in 0..500 {
         let mut num = 0;
@@ -32,6 +32,7 @@ fn main() -> Result<()> {
         if soln.solved && soln.unique {
             assert!(board == Board::from_b64(&board.b64()));
             writeln!(file, "{}", board.b64())?;
+            writeln!(file, "{}", soln.forced_board().b64())?;
         }
 
         println!("TTG: {}s", end.duration_since(start).as_secs_f32());

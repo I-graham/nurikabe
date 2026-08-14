@@ -22,6 +22,14 @@ pub struct Solution {
 }
 
 impl Solution {
+    pub fn hypothetical_steps(&self) -> usize {
+        use Reason::*;
+        self.reasons
+            .iter()
+            .map(|r| if let ByContradiction(n) = r { *n } else { 0 })
+            .sum()
+    }
+
     pub fn steps(&self) -> usize {
         use Reason::*;
         self.reasons
@@ -60,9 +68,45 @@ pub fn solve_with_limits(board: &Board, max_depth: usize) -> Solution {
     solve_knowing(&mut knowledge)
 }
 
+pub fn next_step(board: &Board) -> Option<(Board, Reason)> {
+    let known = &mut Knowledge::new(board);
+
+    use ReasonKind::*;
+    'solve: loop {
+        let board = known.board();
+
+        for rule in RULES {
+            rule(known, &board);
+            let reason = known.take_reason();
+
+            match reason {
+                MaxDepthReached => {
+                    if let Some(max) = known.raise_max
+                        && max <= known.depth_limit
+                    {
+                        break 'solve None;
+                    } else {
+                        known.raise_depth_limit();
+                        known.reason = Nil;
+                        continue 'solve;
+                    }
+                }
+                Contradiction => break 'solve None,
+                Loud(reason) => {
+                    return Some((known.board(), reason));
+                }
+                Quiet(_) => continue 'solve,
+                Nil => (),
+            }
+        }
+
+        break None;
+    }
+}
+
 pub fn solve_knowing(known: &mut Knowledge) -> Solution {
     use ReasonKind::*;
-    
+
     let board = known.board();
     let mut states = vec![board.clone()];
     let mut reasons = vec![];
@@ -77,8 +121,10 @@ pub fn solve_knowing(known: &mut Knowledge) -> Solution {
 
             match reason {
                 MaxDepthReached => {
-                    if let Some(max) = known.raise_max && max <= known.depth_limit {
-                        break
+                    if let Some(max) = known.raise_max
+                        && max <= known.depth_limit
+                    {
+                        break;
                     } else {
                         known.raise_depth_limit();
                         known.reason = Nil;

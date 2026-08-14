@@ -5,7 +5,10 @@ edition = "2024"
 
 [dependencies]
 ratatui = { version = "0.30.0-alpha.0" }
-mimalloc = "*"
+mimalloc = { version = "*", optional = true}
 rustc-hash = "2.1.1"
 rand = "0.9"
 base64 = "0.22"
+
+[features]
+mimalloc = ["dep:mimalloc"]
